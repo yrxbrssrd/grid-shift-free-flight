@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#070c18">
+  <title>Grid Shift · Free Flight</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="arcade.css">
+  <script src="outer-districts.js" defer></script>
+  <script src="open-model.js" defer></script>
+  <script type="module" src="arcade.js"></script>
+</head>
+<body>
+  <main>
+    <header class="mast">
+      <a class="brand" href="" aria-label="Grid Shift home"><span class="brand-icon" aria-hidden="true">ϟ</span> GRID<span>SHIFT</span></a>
+      <div class="mast-actions">
+        <button type="button" id="audio" aria-pressed="true">Sound on</button>
+        <button type="button" id="pause" disabled>Pause</button>
+      </div>
+    </header>
+
+    <section class="stage" id="stage" aria-label="Drone flight" data-phase="0" data-status="menu">
+      <canvas id="world" aria-hidden="true"></canvas>
+      <div class="glass" aria-hidden="true"></div>
+
+      <div class="flight-hud" id="hud" hidden>
+        <div class="flight-info objective">
+          <p class="stamp" id="charged">0 / 6 SUBSTATIONS</p>
+          <h2 id="sector-name">Docklands</h2>
+          <p id="sector-goal"></p>
+          <p id="route-next"></p>
+          <p id="airspace-warning" hidden>Approaching airspace limit</p>
+        </div>
+        <div class="flight-info navigation">
+          <canvas id="map" width="190" height="155" aria-label="Minimap showing the drone, target and substations"></canvas>
+          <button type="button" id="next-target" title="Change target (M)">Next target <kbd>M</kbd></button>
+          <button type="button" id="time-trial" title="Toggle the time trial (T)" aria-pressed="false"><span id="time-trial-label">Time trial</span> <kbd>T</kbd></button>
+        </div>
+        <div class="telemetry flight-info">
+          <div id="phase-label">CYAN PHASE</div>
+          <div class="cargo" aria-label="Energy cells aboard"><span class="cyan" id="cargo-cyan">0 cyan</span><span class="pink" id="cargo-pink">0 pink</span></div>
+          <span id="altitude">7 m</span><span id="integrity" aria-label="Hull integrity">◆ ◆ ◆</span>
+          <div class="meter" id="boost-meter" role="meter" aria-label="Boost charge" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><i></i></div>
+        </div>
+      </div>
+      <div class="waypoint" id="waypoint" aria-hidden="true" hidden><span id="waypoint-arrow">◆</span><small id="waypoint-label"></small></div>
+      <p class="dispatch-message" id="dispatch-message" role="status" hidden></p>
+
+      <div class="screen" id="screen">
+        <section class="screen-content" aria-labelledby="screen-title">
+          <p class="eyebrow" id="screen-kicker">HARBOR DISPATCH</p>
+          <h1 id="screen-title">Grid offline</h1>
+          <p id="screen-copy">Courier, six substations are dark. Match your phase to recover cells, activate rooftop relays, and deliver the charge each district needs.</p>
+          <dl class="screen-stats" id="screen-stats" hidden>
+            <div><dt>Online</dt><dd id="report-online">—</dd></div>
+            <div><dt>Cells</dt><dd id="report-cells">—</dd></div>
+            <div><dt>Air time</dt><dd id="report-time">—</dd></div>
+            <div><dt>Score</dt><dd id="report-score">—</dd></div>
+          </dl>
+          <div class="screen-actions">
+            <button type="button" class="primary" id="play" disabled>Loading flight…</button>
+            <button type="button" id="new-mission" hidden>New mission</button>
+          </div>
+        </section>
+      </div>
+
+      <div id="touch-panel" class="touch-panel" hidden>
+        <button type="button" id="touch-down" aria-label="Descend">− ALT</button>
+        <button type="button" id="touch-up" aria-label="Ascend">+ ALT</button>
+        <button type="button" id="touch-phase" aria-label="Shift phase">SHIFT</button>
+        <button type="button" id="touch-drop" aria-label="Release a cell of the current phase">DROP</button>
+      </div>
+    </section>
+
+    <footer class="bottom">
+      <div class="controls">
+        <span class="keyboard-controls"><kbd>↑ ↓</kbd> Forward / reverse</span>
+        <span class="keyboard-controls"><kbd>← →</kbd> Turn</span>
+        <span class="keyboard-controls"><kbd>R / F</kbd> Ascend / descend</span>
+        <span class="keyboard-controls"><kbd>Shift</kbd> Phase</span>
+        <span class="keyboard-controls"><kbd>X / C</kbd> Boost / brake</span>
+        <span class="keyboard-controls"><kbd>V</kbd> Release cell</span>
+        <span class="touch-controls">Drag to steer · Hold ALT to climb or descend</span>
+      </div>
+      <span class="best" id="best">BEST 0000</span>
+    </footer>
+    <noscript><p>Enable JavaScript to play Grid Shift.</p></noscript>
+  </main>
+</body>
+</html>
