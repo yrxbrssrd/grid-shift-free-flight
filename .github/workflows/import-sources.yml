@@ -1,0 +1,63 @@
+name: Import the Game Off release
+on:
+  push:
+    paths:
+      - '.github/workflows/import-sources.yml'
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify and publish the 28 release files
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p vendor
+          cat > "$RUNNER_TEMP/checksums" <<'CHECKSUMS'
+          0e375d3c1a6eb9357ebeed3f04a19554ab68fceafe4f330345cf72e15508e612 README.md
+          cfc539e3066267c8c5ec0e3a16554d2ed7d5aaa2a5fe5272f25889e730d2e78d arcade.css
+          5f780f5646326fef43b4bba487348f1c63efdb6cd887be4ba0e0693753729776 arcade.js
+          722e6badf6fbf59d05010a6874225a2b98c9ae949a2331e829512939cb50018c city-reflections.js
+          51257946c31e1513a92194bef16ce7c153d6b852580a7e57301cb6bed371a815 courier-ship.js
+          004828454ccaac746e444236db7b77992122d10a6e0b8f2d3d04d011f81afb94 cyber-facades.js
+          676934e582d81b664589fcfdfed983ed7ebff7bc2031c7e72383c71918bbbdae cyber-harbor.js
+          bc45bbf84564970c5e1cdc799963e2b8a12c8e2f7d494a0663853a3d31dedef3 cyber-signs.js
+          fc921a56c5a26a3dc54b7f0498c171739052d4c9e1e73285f52bfc5157186c82 cyber-streets.js
+          9158f27bb39d859fb6117f6ad2d16887af525998634568b02c5e668e845ef74c cyber-traffic.js
+          000d8512f5b5b37d5145359ad650e8a1b1d14c23c1f69395228c7db9d6ae0043 cyber-weather.js
+          3c10faee56d37db01988f4d329163f1710bbf5fbaeb58ba744b8350c09b944dc district-streets.js
+          0447d52d89569c3b71ae11338ad091961ad707786e3d2d614dfca0fff639b083 drone-audio.js
+          47d9ae72a2254bad7ef7ddb52a7fc0a83158788aaa0f64b56749f429bc0511d7 flight-audio.js
+          1cc0aa867698e274bfbb4498d3572b891fbd1aec882f63b25f8727f47e44751c index.html
+          7d5b9511e3ff5496ceca96985b771d172cfe9ca1d4ce9adb870b450eafd5449b open-model.js
+          8bfa4905a3c44a009b45beb21c0bb1c3da68c1ca3a7f0a42b1b62688dc249e4e open-world.js
+          9b6794aecb4d1320c6f3f548f13cc31571c30733916cc7dd97ee5b61e55105fd outer-city.js
+          ab37097282915afa12153e8741f161728252be7a9a671aee5ede13ce258a210f outer-districts.js
+          9e96123852bf6bd6f4b360e223fbdcf490b07b0ffc58eb802a424bd69600cca0 rain-impact.js
+          ad93acf3c1928d7d6d348d97e69ec9a56668badff08a8566f979957470cac749 road-spray.js
+          7790dad30b18c5fdcdc948b5de89b83a0341dc70854c1ec35becb6ecfd800604 skybridges.js
+          1680a9665c177bb4f36039c8d3d4ea1442c0846108e6cebd9a1e494632465e5b street-surfaces.js
+          b22551be93c94d8641cfc91b25aa3a476388bf3b64d003c62bb3476fb49eae35 traffic-audio.js
+          db6e888ba7662deeb6da42d19ef74d84ba8d7b154b69a4685ee61281d96c780f vehicle-reflections.js
+          852e0e8699169bf9f6fdc6bda3e682d078dcbc738b5d33e74df594721bff271d vendor/THREE-LICENSE.txt
+          313203957197800a1dfa954cfde84103be12bcd8e33aeee07be04216002b2e6d vendor/three.module.js
+          f2f221673a5fe39168c858c47bf32a13627bb9405d84ef558e1166e687cd39b0 waterfront-life.js
+          CHECKSUMS
+          while read -r checksum file; do
+            curl --fail --silent --show-error --location --retry 3 "https://html-classic.itch.zone/html/20686603/$file" -o "$file"
+          done < "$RUNNER_TEMP/checksums"
+          python3 - <<'PY'
+          from pathlib import Path
+          page = Path('index.html')
+          footer = b'<script defer src="https://static.itch.io/htmlgame.js" type="text/javascript"></script>\n'
+          page.write_bytes(page.read_bytes().removesuffix(footer))
+          PY
+          sha256sum --check "$RUNNER_TEMP/checksums"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- README.md index.html arcade.css *.js vendor/
+          git commit -m 'Publish the verified Grid Shift Free Flight release sources'
+          git push origin HEAD:main
